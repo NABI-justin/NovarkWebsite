@@ -6,7 +6,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 const BLUE = "#0B3D91";
 
@@ -33,14 +32,14 @@ const NAV_ITEMS = [
       ],
       "Projets": [
         { label: "AgroScan",  href: "/projets/agroscan" },
-        { label: "En cours",  href: "/projets"          },
-        { label: "À venir",   href: "/projets#avenir"   },
+        { label: "En cours",  href: "/projets", actif: true },
+        { label: "À venir",   href: "", actif: false },
       ],
       "À propos": [
         { label: "Notre histoire", href: "/apropos#histoire"    },
         { label: "Notre équipe",   href: "/apropos#equipe"      },
         { label: "Notre mission",  href: "/apropos#mission"     },
-        { label: "Partenaires",    href: "/apropos#partenaires" },
+        { label: "Partenaires",    href: "", actif: false },
       ],
     },
   },
@@ -83,8 +82,8 @@ const NAV_ITEMS = [
         { label: "API & Intégrations", href: "/novark-plus#api"   },
       ],
       "Ressources": [
-        { label: "Documentation", href: "/novark-plus#docs"   },
-        { label: "Outils",        href: "/novark-plus#outils" },
+        { label: "Documentation", href: "", actif: false },
+        { label: "Outils", href: "", actif: false },
       ],
     },
   },
@@ -95,7 +94,6 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const navRef = useRef<HTMLDivElement>(null);
-  const pathname = usePathname();
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -105,7 +103,6 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  useEffect(() => { setOpenKey(null); }, [pathname]);
 
   return (
     <>
@@ -179,15 +176,21 @@ export default function Navbar() {
                     <div style={{ fontSize: 9, color: BLUE, letterSpacing: "0.25em", fontWeight: 700, textTransform: "uppercase", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid #eee" }}>
                       {cat}
                     </div>
-                    {(links as { label: string; href: string }[]).map(l => (
-                      <Link key={l.href} href={l.href}
-                        style={{ display: "block", fontSize: 13, color: "#333", textDecoration: "none", padding: "7px 0", fontWeight: 500, borderBottom: "1px solid #f5f5f5", transition: "all 0.12s" }}
-                        onMouseEnter={e => { e.currentTarget.style.color = BLUE; e.currentTarget.style.paddingLeft = "6px"; }}
-                        onMouseLeave={e => { e.currentTarget.style.color = "#333"; e.currentTarget.style.paddingLeft = "0"; }}
-                      >
-                        {l.label}
-                      </Link>
-                    ))}
+                    {(links as { label: string; href: string; actif?: boolean }[]).map((l, idx) =>
+                      l.actif === false ? (
+                        <span key={`${cat}-${idx}`} style={{ display: "block", fontSize: 13, color: "#aaa", textDecoration: "none", padding: "7px 0", fontWeight: 500, borderBottom: "1px solid #f5f5f5", cursor: "not-allowed" }}>
+                          {l.label} (bientôt)
+                        </span>
+                      ) : (
+                        <Link key={l.href} href={l.href}
+                          style={{ display: "block", fontSize: 13, color: "#333", textDecoration: "none", padding: "7px 0", fontWeight: 500, borderBottom: "1px solid #f5f5f5", transition: "all 0.12s" }}
+                          onMouseEnter={e => { e.currentTarget.style.color = BLUE; e.currentTarget.style.paddingLeft = "6px"; }}
+                          onMouseLeave={e => { e.currentTarget.style.color = "#333"; e.currentTarget.style.paddingLeft = "0"; }}
+                        >
+                          {l.label}
+                        </Link>
+                      )
+                    )}
                   </div>
                 ))}
               </div>
